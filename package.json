@@ -1,0 +1,24 @@
+{
+  "name": "5.nodejs",
+  "version": "1.0.0",
+  "description": "i create this repository because of that i wanna track my self with studing node.js",
+  "main": "app.js",
+  "dependencies": {
+    "intellisense": "^0.0.1",
+    "npm": "^6.14.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamMohamedGoher/nodejs-studying.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SamMohamedGoher/nodejs-studying/issues"
+  },
+  "homepage": "https://github.com/SamMohamedGoher/nodejs-studying#readme"
+}
