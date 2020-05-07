@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "intellisense": "^0.0.1",
+    "joi": "^14.3.1",
     "npm": "^6.14.4"
   },
   "devDependencies": {},
