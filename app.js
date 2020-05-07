@@ -160,14 +160,13 @@ app.get(`/api/courses`, (req, res) => {
 
 app.get(`/api/courses/:id`, (req, res) => {
     let currentCourse = coursesArray.find(x => req.params.id == x.id);
-    if(!currentCourse) res.status(404).send(`<h1>this course is not found</h1>`);
+    if(!currentCourse) return res.status(404).send(`<h1>this course is not found</h1>`);
     else res.status(200).send(currentCourse);
 });
 
 app.post(`/api/courses`, (req ,res) => {
     const result = validateCourse(req.body);
-    if(result.error)
-        res.status(400).send(result.error.details[0].message);
+    if(result.error) return res.status(400).send(result.error.details[0].message);
     else {
         let newCourse = {
             id: coursesArray.length +1,
@@ -180,11 +179,10 @@ app.post(`/api/courses`, (req ,res) => {
 
 app.put(`/api/courses/:id`, (req, res) => {
     let currentCourse = coursesArray.find(arr => arr.id == req.params.id);
-    if(!currentCourse) res.status(404).send(`<h1>this course is not found</h1>`);
+    if(!currentCourse) return res.status(404).send(`<h1>this course is not found</h1>`);
     else {
         const result = validateCourse(req.body);
-        if(result.error)
-            res.status(400).send(result.error.details[0].message);
+        if(result.error) return res.status(400).send(result.error.details[0].message);
         else {
         currentCourse.name = req.body.name;
         res.status(200).send(currentCourse);
@@ -194,7 +192,7 @@ app.put(`/api/courses/:id`, (req, res) => {
 
 app.delete(`/api/courses/:id`, (req, res) => {
     let currentCourse = coursesArray.find(arr => arr.id == req.params.id);
-    if(!currentCourse) res.status(404).send(`<h1>this course is not found</h1>`);
+    if(!currentCourse) return res.status(404).send(`<h1>this course is not found</h1>`);
     else {
         let index = coursesArray.indexOf(currentCourse);
         coursesArray.splice(index, 1);
