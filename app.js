@@ -122,40 +122,91 @@ console.log(`Listening to port 8080...`);
 
 // RESTful APIs using express
 
-// 'get' requst
-
 /*
 
 const express = require(`express`);
+const Joi = require(`joi`);
 
 const app = express();
+app.use(express.json());
 
-let arr = [
-    {id: 1, name: `course1`},
-    {id: 2, name: `course2`},
-    {id: 3, name: `course3`}
+let x = 0;
+function idGenerate() {
+    x++;
+    return x;
+}
+
+let coursesArray = [
+    {id: idGenerate(), name: `course1`},
+    {id: idGenerate(), name: `course2`},
+    {id: idGenerate(), name: `course3`}
 ];
 
-app.get(`/`, (req, res) => {
+function validateCourse(course) {
+    const schema = {
+        name: Joi.string().min(3).max(12).required() 
+    };
+    return Joi.validate(course, schema);
+}
+
+app.get(`/api/courses`, (req, res) => {
     res.send(`
-    <h1>Hello world!!</h1>
-    <h2><a href="http://localhost:8080/courses/1">Go to course1</a></h2>
-    <h2><a href="http://localhost:8080/courses/2">Go to course2</a></h2>
-    <h2><a href="http://localhost:8080/courses/3">Go to course3</a></h2>
+    <h1>Courses:</h1>
+    <h2><a href="http://localhost:8080/api/courses/1">Go to course1</a></h2>
+    <h2><a href="http://localhost:8080/api/courses/2">Go to course2</a></h2>
+    <h2><a href="http://localhost:8080/api/courses/3">Go to course3</a></h2>
     `);
 });
 
-app.get(`/courses/:id`, (req, res) => {
-    let courseNum = arr.find(x => req.params.id == x.id);
-    if(!courseNum) {
-        res.status(404);
-        res.send(`<h1>this course is not found!!</h1>`);
-    } else res.send(courseNum);
+app.get(`/api/courses/:id`, (req, res) => {
+    let currentCourse = coursesArray.find(x => req.params.id == x.id);
+    if(!currentCourse) res.status(404).send(`<h1>this course is not found</h1>`);
+    else res.status(200).send(currentCourse);
 });
 
-let port = process.env.PORT || 8080;
+app.post(`/api/courses`, (req ,res) => {
+    const result = validateCourse(req.body);
+    if(result.error)
+        res.status(400).send(result.error.details[0].message);
+    else {
+        let newCourse = {
+            id: coursesArray.length +1,
+            name: req.body.name
+        };
+        coursesArray.push(newCourse);
+        res.status(200).send(newCourse);
+    }
+});
 
-app.listen(port, () => {console.log(`listening to port ${port}...`);});
+app.put(`/api/courses/:id`, (req, res) => {
+    let currentCourse = coursesArray.find(arr => arr.id == req.params.id);
+    if(!currentCourse) res.status(404).send(`<h1>this course is not found</h1>`);
+    else {
+        const result = validateCourse(req.body);
+        if(result.error)
+            res.status(400).send(result.error.details[0].message);
+        else {
+        currentCourse.name = req.body.name;
+        res.status(200).send(currentCourse);
+        }
+    }
+});
+
+app.delete(`/api/courses/:id`, (req, res) => {
+    let currentCourse = coursesArray.find(arr => arr.id == req.params.id);
+    if(!currentCourse) res.status(404).send(`<h1>this course is not found</h1>`);
+    else {
+        let index = coursesArray.indexOf(currentCourse);
+        coursesArray.splice(index, 1);
+        res.status(200).send(currentCourse);
+    }
+});
+
+const port = process.env.PORT || 8080;
+
+app.listen(port, () => {
+    console.log(`listening to port ${port}...`);
+});
 
 */
 
