@@ -128,83 +128,169 @@ const express = require(`express`);
 const Joi = require(`joi`);
 
 const app = express();
+
+function inputValidation(x) {
+    const schema = {
+        name: Joi.string().min(3).required()
+    };
+    return Joi.validate(x, schema);
+}
+
+
 app.use(express.json());
 
-let x = 0;
-function idGenerate() {
-    x++;
-    return x;
-}
-
-let coursesArray = [
-    {id: idGenerate(), name: `course1`},
-    {id: idGenerate(), name: `course2`},
-    {id: idGenerate(), name: `course3`}
+let arr = [
+    {id: 1, name:`course1`},
+    {id: 2, name:`course2`},
+    {id: 3, name:`course3`}
 ];
 
-function validateCourse(course) {
-    const schema = {
-        name: Joi.string().min(3).max(12).required() 
-    };
-    return Joi.validate(course, schema);
-}
-
 app.get(`/api/courses`, (req, res) => {
-    res.send(`
+    res.status(200).send(`
     <h1>Courses:</h1>
-    <h2><a href="http://localhost:8080/api/courses/1">Go to course1</a></h2>
-    <h2><a href="http://localhost:8080/api/courses/2">Go to course2</a></h2>
-    <h2><a href="http://localhost:8080/api/courses/3">Go to course3</a></h2>
+    <h2><a href="http://localhost:3000/api/courses/1">Go to course1</a></h2>
+    <h2><a href="http://localhost:3000/api/courses/2">Go to course2</a></h2>
+    <h2><a href="http://localhost:3000/api/courses/3">Go to course3</a></h2>
     `);
 });
 
 app.get(`/api/courses/:id`, (req, res) => {
-    let currentCourse = coursesArray.find(x => req.params.id == x.id);
-    if(!currentCourse) return res.status(404).send(`<h1>this course is not found</h1>`);
-    else res.status(200).send(currentCourse);
+    let currentCourse = arr.find(x => x.id === parseInt(req.params.id));
+    if(!currentCourse) return res.status(404).send(`<h2>this course not found</h2>`)
+    res.status(200).send(currentCourse);
 });
 
-app.post(`/api/courses`, (req ,res) => {
-    const result = validateCourse(req.body);
-    if(result.error) return res.status(400).send(result.error.details[0].message);
-    else {
-        let newCourse = {
-            id: coursesArray.length +1,
-            name: req.body.name
-        };
-        coursesArray.push(newCourse);
-        res.status(200).send(newCourse);
-    }
+app.post(`/api/courses`, (req, res) => {
+    const {error} = inputValidation(req.body);
+    if(error) return res.status(400).send(error.details[0].message);
+    let newCourse = {
+        id: arr.length +1,
+        name: req.body.name
+    };
+    arr[arr.length] = newCourse;
+    res.status(200).send(newCourse);
 });
 
 app.put(`/api/courses/:id`, (req, res) => {
-    let currentCourse = coursesArray.find(arr => arr.id == req.params.id);
-    if(!currentCourse) return res.status(404).send(`<h1>this course is not found</h1>`);
-    else {
-        const result = validateCourse(req.body);
-        if(result.error) return res.status(400).send(result.error.details[0].message);
-        else {
-        currentCourse.name = req.body.name;
-        res.status(200).send(currentCourse);
-        }
-    }
+    const currentCourse = arr.find(x => x.id === parseInt(req.params.id));
+    if(!currentCourse) return res.status(404).send(`this course not found`);
+    const {error} = inputValidation(req.body);
+    if(error) return res.status(400).send(error.details[0].message);
+    currentCourse.name = req.body.name;
+    res.status(200).send(currentCourse);
 });
 
 app.delete(`/api/courses/:id`, (req, res) => {
-    let currentCourse = coursesArray.find(arr => arr.id == req.params.id);
-    if(!currentCourse) return res.status(404).send(`<h1>this course is not found</h1>`);
-    else {
-        let index = coursesArray.indexOf(currentCourse);
-        coursesArray.splice(index, 1);
-        res.status(200).send(currentCourse);
-    }
+    const currentCourse = arr.find(x => x.id === parseInt(req.params.id));
+    if(!currentCourse) return res.status(404).send(`this course not found`);
+    let index = arr.indexOf(currentCourse);
+    arr.splice(index, 1);
+    res.send(currentCourse);
 });
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
-    console.log(`listening to port ${port}...`);
+app.listen(port, () => console.log(`listening to port ${port}`));
+
+*/
+
+// first project 'vidly'
+
+/*
+
+const express = require(`express`);
+const Joi = require(`joi`);
+
+const app = express();
+app.use(express.json());
+
+let genreStore = [
+    {id: 1, name: `horor`, movies: [
+        {id: 1, name: `Us (2019)`},
+        {id: 2, name: `Get Out (2017)`},
+        {id: 3, name: `The Conjuring`}
+    ]},
+    {id: 2, name: `action`, movies: [
+        {id: 1, name: `The Avengers`},
+        {id: 2, name: `Mission Impossible`},
+        {id: 3, name: `John Wick`}
+    ]},
+    {id: 3, name: `drama`, movies: [
+        {id: 1, name: `Parasite`},
+        {id: 2, name: `Once Upon a Time in HollyWood`},
+        {id: 3, name: `Joker`}
+    ]}
+];
+
+function inputValidation(genre) {
+    const schema = {
+        name: Joi.string().min(3).required(),
+        movies: Joi.array().min(3).required() || [
+            {name: Joi.string().min(3).required()},
+            {name: Joi.string().min(3).required()},
+            {name: Joi.string().min(3).required()}
+        ]
+    };
+    return Joi.validate(genre, schema);
+}
+
+app.get(`/api/genres`, (req, res) => {
+    res.send(`
+    <h1>Movies genres:</h1>
+    <h3><a href="http://localhost:3000/api/genres/horor">horor movies</a></h3>
+    <h3><a href="http://localhost:3000/api/genres/action">action movies</a></h3>
+    <h3><a href="http://localhost:3000/api/genres/drama">drama movies</a></h3>
+    `);
 });
+
+app.get(`/api/genres/:name`, (req, res) => {
+    const currentGenre = genreStore.find(x => x.name === req.params.name);
+    if(!currentGenre) return res.status(404).send(`<h3>the current movies genre not found</h3>`);
+    res.status(200).send(`
+    <h1>${currentGenre.name} movies:</h1>
+    <h3>${currentGenre.movies[0].name}</h3>
+    <h3>${currentGenre.movies[1].name}</h3>
+    <h3>${currentGenre.movies[2].name}</h3>
+    `);
+});
+
+app.post(`/api/genres/`, (req, res) => {
+    let {error} = inputValidation(req.body);
+    if(error) return res.status(400).send(error.details[0].message);
+    const newGenre = {
+        id: genreStore.length +1,
+        name: req.body.name,
+        movies: [
+            {id: 1, name: req.body.movies[0].name},
+            {id: 2, name: req.body.movies[1].name},
+            {id: 3, name: req.body.movies[2].name}
+        ]
+    };
+    genreStore[genreStore.length] = newGenre;
+    res.status(200).send(newGenre);
+});
+
+app.put(`/api/genres/:id`, (req, res) => {
+    const currentGenre = genreStore.find(x => x.id === parseInt(req.params.id));
+    if(!currentGenre) return res.status(404).send(`<h3>the current movies genre not found</h3>`);
+    let {error} = inputValidation(req.body);
+    if(error) return res.status(400).send(error.details[0].message);
+    currentGenre.name = req.body.name;
+    currentGenre.movies = req.body.movies;
+    res.status(200).send(currentGenre);
+});
+
+app.delete(`/api/genres/:id`, (req, res) => {
+    const currentGenre = genreStore.find(x => x.id === parseInt(req.params.id));
+    if(!currentGenre) return res.status(404).send(`<h3>the current movies genre not found</h3>`);
+    let index = genreStore.indexOf(currentGenre);
+    genreStore.splice(index, 1);
+    res.status(200).send(currentGenre);
+});
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => console.log(`listening to port ${port}...`));
 
 */
 
